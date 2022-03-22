@@ -166,17 +166,6 @@ Id *set_get_id(Set *set)
         return NULL;
     }
 
-    /*arr = (Id *)malloc(set->n_ids * sizeof(Id));
-    if (arr == NULL)
-    {
-        return NULL;
-    }
-
-    for (i = 0; i < set->n_ids; i++)
-    {
-        arr[i] = set->array[i];
-    }*/
-
     return set->array;
 }
 
