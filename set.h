@@ -88,6 +88,6 @@ STATUS set_test(Set* set);
  * @param id 
  * @return TRUE if exists
  */
-BOOL set_have_object(Set* set, Id id);
+BOOL set_have_id(Set* set, Id id);
 
 #endif 

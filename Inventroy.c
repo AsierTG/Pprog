@@ -41,53 +41,53 @@ Inventory *inventory_create()
 
     return new;
 }
-STATUS inventory_destroy(Inventory *i)
+STATUS inventory_destroy(Inventory *inv)
 {
-    if (!i)
+    if (!inv)
     {
         return ERROR;
     }
 
-    if (set_destroy(i->objects) == ERROR)
+    if (set_destroy(inv->objects) == ERROR)
     {
         return ERROR;
     }
 
-    free(i);
+    free(inv);
     return OK;
 }
-STATUS inventory_setMAX(Inventory *i, int max)
+STATUS inventory_setMAX(Inventory *inv, int max)
 {
 
-    if (!i)
+    if (!inv)
     {
         return ERROR;
     }
 
-    i->max_objects = max;
+    inv->max_objects = max;
 
     return OK;
 }
 
-int invenory_getMAX(Inventory *i)
+int invenory_getMAX(Inventory *inv)
 {
-    if (!i)
+    if (!inv)
     {
         return NULL;
     }
 
-    return i->max_objects;
+    return inv->max_objects;
 }
 
-STATUS inventory_addObject(Inventory *i, Id obj)
+STATUS inventory_addObject(Inventory *inv, Id obj)
 {
 
-    if (!i || !obj)
+    if (!inv || !obj)
     {
         return ERROR;
     }
 
-    if (set_add(i->objects, obj) == ERROR)
+    if (set_add(inv->objects, obj) == ERROR)
     {
         return ERROR;
     }
@@ -95,14 +95,14 @@ STATUS inventory_addObject(Inventory *i, Id obj)
     return OK;
 }
 
-STATUS inventory_delObject(Inventory *i, Id obj)
+STATUS inventory_delObject(Inventory *inv, Id obj)
 {
-    if (!i || !obj)
+    if (!inv || !obj)
     {
         return ERROR;
     }
 
-    if (set_delete(i->objects, obj) == ERROR)
+    if (set_delete(inv->objects, obj) == ERROR)
     {
         return ERROR;
     }
@@ -110,15 +110,15 @@ STATUS inventory_delObject(Inventory *i, Id obj)
     return OK;
 }
 
-STATUS inventory_print(Inventory *i)
+STATUS inventory_print(Inventory *inv)
 {
-    if (!i)
+    if (!inv)
     {
         return ERROR;
     }
 
-    fprintf(stdout, "Elementos del inventario:\n Numero maximo de objetos: %i\nObjetos: \n", i->max_objects);
-    if (set_print(i->objects) == ERROR)
+    fprintf(stdout, "Elementos del inventario:\n Numero maximo de objetos: %i\nObjetos: \n", inv->max_objects);
+    if (set_print(inv->objects) == ERROR)
     {
         return ERROR;
     }

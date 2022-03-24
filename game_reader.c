@@ -4,11 +4,13 @@
 #include "game_reader.h"
 #include "space.h"
 #include "object.h"
+#include "enemy.h"
+#include "player.h"
 
 /**
    Lee un fichero con el mapa
 */
-STATUS game_load_spaces(Game *game, char *filename)
+STATUS game_reader_load_spaces(Game *game, char *filename)
 {
   int i;
   FILE *file = NULL;
@@ -87,7 +89,7 @@ STATUS game_load_spaces(Game *game, char *filename)
   return status;
 }
 
-STATUS game_load_objects(Game *game, char *filename)
+STATUS game_reader_load_objects(Game *game, char *filename)
 {
   FILE *file = NULL;
   char line[WORD_SIZE] = "";
@@ -140,7 +142,8 @@ STATUS game_load_objects(Game *game, char *filename)
   return OK;
 }
 
-STATUS game_load_player(Game *game, char *filename){
+STATUS game_reader_load_player(Game *game, char *filename){
+  
         if(!game || !filename) return ERROR;
         
         FILE *file;
@@ -151,14 +154,19 @@ STATUS game_load_player(Game *game, char *filename){
         char line[WORD_SIZE] = "";
         char name[WORD_SIZE] = "";
         char *toks = NULL;
+        Player *player = NULL;
+        
+        player = game_get_player(game);
+        if(!player) return ERROR;
         
         file = fopen(filename, "r");
         if(!file) return ERROR;
         
         while(fgets(line, WORD_SIZE, file)){
-             
-              if(strncmp("#p", line, 3) == 0)
+        
+              if(strncmp("#p:", line, 3) == 0)
               {
+                
                  toks = strtok(line + 3, "|");
                  player_id = atol(toks);            // Guarda la ID del jugador.
                  
@@ -168,12 +176,81 @@ STATUS game_load_player(Game *game, char *filename){
                  toks = strtok(NULL, "|");
                  space_id = atol(toks);             // Guarda la id del espacio.
                  
-                 toks = strtok(NULL, "|"),
+                 toks = strtok(NULL, "|");
+                 health = atol(toks);               // Guarda la salud del jugador.
+                 
+                 toks = strtok(NULL, "|");
+                 inventory_size = atol(toks);       // Guarda el tamaño del inventario del jugador.
+#ifdef DEBUG
+        printf("Leido: %ld,%s,%ld,%f,%d", player_id, name, space_id, health, inventory_size);
+#endif
+                 player = player_create(player_id);     // Inicia un nuevo player con la id obtenida.
+                 if(!player)return ERROR;
+                 
+                 if(player_set_name(player,name) == ERROR) return ERROR;     // Establece el nombre del jugador.
+                 
+                 if(game_set_player_location(game,space_id) == ERROR) return ERROR;     
+                 
+                 if(player_set_health(player,health) == ERROR) return ERROR;         // Establece la salud del jugador.
                  
               }
               
               
         }
+    fclose(file);
+    return OK;
         
+}
+
+STATUS game_reader_load_enemy(Game *game, char *filename){
+        if(!game || !filename) return ERROR;
         
+        FILE *file;
+        Id enemy_id = NO_ID;
+        char name[WORD_SIZE] = "";
+        char line[WORD_SIZE] = "";
+        char *toks = NULL;
+        Id space_id = NO_ID;
+        float health;
+        Enemy *enemy = NULL;
+        
+        enemy = game_get_enemy;
+        if(!enemy) return ERROR;
+        
+        file = fopen(filename, "r");
+        if(!file) return ERROR;
+        
+        while(fgets(line, WORD_SIZE, file)){
+            
+            if(strncmp("#e:", line, 3) == 0)
+            {
+             
+             toks = strtok(line + 3, "|");
+             enemy_id = atol(toks);                 // Guarda la id del enemigo.
+             
+             toks = strtok(NULL, "|");
+             strcpy(name,toks);                      // Guarda el nombre del enemigo.
+             
+             toks = strtok(NULL, "|");
+             space_id = atol(toks);                 // Guarda la id del espacio en el que esta el enemigo.
+             
+             toks = strtok(NULL, "|");
+             health = atol(toks);                   // Guarda la salud del enemigo.
+#ifdef DEBUG
+            printf("Leido: %ld,%s,%ld,%f.", enemy_id, name, space_id, health);
+#endif
+            enemy = enemy_create(enemy_id);
+            if(!enemy) return ERROR;
+            
+            if(enemy_set_name(enemy,name) == ERROR) return ERROR;
+            
+            if(game_set_enemy_location(enemy,space_id) == ERROR) return ERROR;
+            
+            if(enemy_set_health(enemy,health) == ERROR) return ERROR;
+            
+            }
+        }
+    fclose(file);
+    return OK;
+    
 }

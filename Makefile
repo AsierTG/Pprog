@@ -1,7 +1,7 @@
 CC = gcc 
 ARGU = -Wall -pedantic -c -g 
 
-all: hormiguero space_test enemy_test clean
+all: hormiguero space_test enemy_test clear
 hormiguero: game_loop.o command.o game.o graphic_engine.o space.o game_reader.o object.o player.o set.o enemy.o
 	$(CC) -o hormiguero game_loop.o command.o game.o graphic_engine.o space.o game_reader.o object.o player.o set.o enemy.o -L. -lscreen
 
@@ -53,7 +53,10 @@ enemy.o: enemy.c enemy.h set.h
 	$(CC) $(ARGU) enemy.c
 
 clean:
-	rm -f *.o  
+	rm -f hormiguero
+
+clear:
+	rm -f *.o
 
 
 

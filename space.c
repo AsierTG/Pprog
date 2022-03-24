@@ -328,7 +328,7 @@ BOOL space_have_object(Space* space, Id id) {
     return FALSE;
   }
 
-  if(set_have_object(space->object,id)==TRUE){
+  if(set_have_id(space->object,id)==TRUE){
     return TRUE;
   }else
     return FALSE;

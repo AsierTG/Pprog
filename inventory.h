@@ -33,7 +33,7 @@ Inventory *inventory_create();
  * @param i puntero a Inventory
  * @return devuelve ERROR en caso de fallo, en cualquier otro caso OK.
  */
-STATUS inventory_destroy(Inventory *i);
+STATUS inventory_destroy(Inventory *inv);
 
 /**
  * @brief Almacena una id que recibe como argumento en el array de Inventory.
@@ -42,7 +42,7 @@ STATUS inventory_destroy(Inventory *i);
  * @param max capacidad maxima del Inventario
  * @return devuelve ERROR en caso de fallo, en cualquier otro caso OK.
  */
-STATUS inventory_setMAX(Inventory *i, int max);
+STATUS inventory_setMAX(Inventory *inv, int max);
 
 /**
  * @brief devuelve la capacidad maxima de elementos que puede almacenar el inventario.
@@ -50,7 +50,7 @@ STATUS inventory_setMAX(Inventory *i, int max);
  * @param i puntero a Inventory.
  * @return numero maximo.
  */
-int invenory_getMAX(Inventory *i);
+int invenory_getMAX(Inventory *inv);
 
 /**
  * @brief Almacena una id que recibe como argumento en el array de Inventory.
@@ -59,7 +59,7 @@ int invenory_getMAX(Inventory *i);
  * @param obj
  * @return devuelve ERROR en caso de fallo, en cualquier otro caso OK.
  */
-STATUS inventory_addObject(Inventory *i, Id obj);
+STATUS inventory_addObject(Inventory *inv, Id obj);
 
 /**
  * @brief Elimina un objeto del array de Inventory.
@@ -68,7 +68,7 @@ STATUS inventory_addObject(Inventory *i, Id obj);
  * @param obj Id del objeto que deseas eliminar.
  * @return devuelve ERROR en caso de fallo, en cualquier otro caso OK.
  */
-STATUS inventory_delObject(Inventory *i, Id obj);
+STATUS inventory_delObject(Inventory *inv, Id obj);
 
 /**
  * @brief Imprime los datos del Inventario, la capacidad maxima y un array con los objetos.
@@ -76,6 +76,6 @@ STATUS inventory_delObject(Inventory *i, Id obj);
  * @param i puntero a Inventory
  * @return devuelve ERROR en caso de fallo, en cualquier otro caso OK.
  */
-STATUS inventory_print(Inventory *i);
+STATUS inventory_print(Inventory *inv);
 
 #endif

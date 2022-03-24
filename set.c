@@ -143,7 +143,7 @@ int set_get_n_id(Set *set)
  * @return Id
  */
 
-BOOL set_have_object(Set* set, Id id){
+BOOL set_have_id(Set* set, Id id){
   int i;
 
   if(!set||id==NO_ID){

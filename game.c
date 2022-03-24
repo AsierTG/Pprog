@@ -117,15 +117,24 @@ STATUS game_create_from_file(Game *game, char *filename)
   if (game_create(game) == ERROR)
     return ERROR;
 
-  if (game_load_spaces(game, filename) == ERROR)
+  if (game_reader_load_spaces(game, filename) == ERROR)
     return ERROR;
 
-  if (game_load_objects(game, filename) == ERROR)
+  if (game_reader_load_objects(game, filename) == ERROR)
     return ERROR;
-  /* El jugador y el objeto estan ubicados en el primer espacio */
-  game_set_player_location(game, game_get_space_id_at(game, 0));
-  game_set_object_location(game, game_get_space_id_at(game, 0));
-  game_set_enemy_location(game, game_get_space_id_at(game, 4));
+
+  if (game_reader_load_player(game, filename) == ERROR)
+    return ERROR;
+
+  if (game_reader_load_enemy(game, filename) == ERROR)
+    return ERROR;
+
+  //game_set_player_location(game, game_get_space_id_at(game, 0));
+  //game_set_enemy_location(game, game_get_space_id_at(game, 0));
+  //player_print(game->player);
+  //enemy_print(game->enemy);
+
+  
   return OK;
 }
 
@@ -386,9 +395,9 @@ for(i=0; i < MAX ;i++){
 
 BOOL game_is_over(Game *game)
 {
-  if (player_get_health(game->player) == 0)
+  /*if (player_get_health(game->player) == 0)
     return TRUE;
-  else
+  else*/
     return FALSE;
 }
 
