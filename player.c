@@ -142,14 +142,14 @@ STATUS player_set_location(Player *player, Id id)
 }*/
 
 
- Id *player_get_object(Player *player){
+ Id player_get_object(Player *player){
 
   if (!player)
   {
     return NO_ID;
   }
 
-  return ; //Inventory get object.
+  return NO_ID; //Inventory get object.
 }
 
 /** Establece si el jugador tiene un objeto o no */

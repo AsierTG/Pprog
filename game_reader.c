@@ -6,11 +6,11 @@
 #include "object.h"
 #include "enemy.h"
 #include "player.h"
-
+#include "link.h"
 /**
    Lee un fichero con el mapa
 */
-STATUS game_reader_load_spaces(Game *game, char *filename)
+STATUS game_load_spaces(Game *game, char *filename)
 {
   int i;
   FILE *file = NULL;
@@ -18,7 +18,7 @@ STATUS game_reader_load_spaces(Game *game, char *filename)
   char name[WORD_SIZE] = "";
   char desc[WORD_SIZE] = "";
   char *toks = NULL;
-  Id id = NO_ID, north = NO_ID, east = NO_ID, south = NO_ID, west = NO_ID;
+  Id id = NO_ID;
   Space *space = NULL;
   STATUS status = OK;
 
@@ -43,23 +43,11 @@ STATUS game_reader_load_spaces(Game *game, char *filename)
       toks = strtok(NULL, "|");
       strcpy(name, toks);
 
-      toks = strtok(NULL, "|");
-      north = atol(toks);
-
-      toks = strtok(NULL, "|");
-      east = atol(toks);
-
-      toks = strtok(NULL, "|");
-      south = atol(toks);
-
-      toks = strtok(NULL, "|");
-      west = atol(toks);
-
       toks = strtok(NULL, "\n");
       strcpy(desc, toks);
 
 #ifdef DEBUG
-      printf("Leido: %ld|%s|%ld|%ld|%ld|%ld|%s\n", id, name, north, east, south, west, desc);
+      printf("Leido: %ld|%s|%s\n", id, name, desc);
 #endif
       space = space_create(id);
       if (space != NULL)
@@ -70,10 +58,6 @@ STATUS game_reader_load_spaces(Game *game, char *filename)
           space_set_gdesc(space, toks, i); /* AÃ±ade la descripciÃ³n grÃ¡fica al juego */
         }
         space_set_name(space, name);
-        space_set_north(space, north);
-        space_set_east(space, east);
-        space_set_south(space, south);
-        space_set_west(space, west);
         game_add_space(game, space);
       }
     }
@@ -89,7 +73,7 @@ STATUS game_reader_load_spaces(Game *game, char *filename)
   return status;
 }
 
-STATUS game_reader_load_objects(Game *game, char *filename)
+STATUS game_load_objects(Game *game, char *filename)
 {
   FILE *file = NULL;
   char line[WORD_SIZE] = "";
@@ -142,8 +126,7 @@ STATUS game_reader_load_objects(Game *game, char *filename)
   return OK;
 }
 
-STATUS game_reader_load_player(Game *game, char *filename){
-  
+STATUS game_load_player(Game *game, char *filename){
         if(!game || !filename) return ERROR;
         
         FILE *file;
@@ -156,17 +139,13 @@ STATUS game_reader_load_player(Game *game, char *filename){
         char *toks = NULL;
         Player *player = NULL;
         
-        player = game_get_player(game);
-        if(!player) return ERROR;
-        
         file = fopen(filename, "r");
         if(!file) return ERROR;
         
         while(fgets(line, WORD_SIZE, file)){
-        
+             
               if(strncmp("#p:", line, 3) == 0)
               {
-                
                  toks = strtok(line + 3, "|");
                  player_id = atol(toks);            // Guarda la ID del jugador.
                  
@@ -189,9 +168,13 @@ STATUS game_reader_load_player(Game *game, char *filename){
                  
                  if(player_set_name(player,name) == ERROR) return ERROR;     // Establece el nombre del jugador.
                  
-                 if(game_set_player_location(game,space_id) == ERROR) return ERROR;     
+                 if(player_set_location(player,space_id) == ERROR) return ERROR;     
                  
+                 //if(game_set_player_location(game,space_id) == ERROR) return ERROR;     
+
                  if(player_set_health(player,health) == ERROR) return ERROR;         // Establece la salud del jugador.
+
+                 if(game_set_player(game, player) == ERROR) return ERROR; 
                  
               }
               
@@ -202,7 +185,7 @@ STATUS game_reader_load_player(Game *game, char *filename){
         
 }
 
-STATUS game_reader_load_enemy(Game *game, char *filename){
+STATUS game_load_enemy(Game *game, char *filename){
         if(!game || !filename) return ERROR;
         
         FILE *file;
@@ -213,9 +196,6 @@ STATUS game_reader_load_enemy(Game *game, char *filename){
         Id space_id = NO_ID;
         float health;
         Enemy *enemy = NULL;
-        
-        enemy = game_get_enemy;
-        if(!enemy) return ERROR;
         
         file = fopen(filename, "r");
         if(!file) return ERROR;
@@ -229,7 +209,7 @@ STATUS game_reader_load_enemy(Game *game, char *filename){
              enemy_id = atol(toks);                 // Guarda la id del enemigo.
              
              toks = strtok(NULL, "|");
-             strcpy(name,toks);                      // Guarda el nombre del enemigo.
+             strcpy(name,toks);                     // Guarda el nombre del enemigo.
              
              toks = strtok(NULL, "|");
              space_id = atol(toks);                 // Guarda la id del espacio en el que esta el enemigo.
@@ -244,13 +224,90 @@ STATUS game_reader_load_enemy(Game *game, char *filename){
             
             if(enemy_set_name(enemy,name) == ERROR) return ERROR;
             
-            if(game_set_enemy_location(enemy,space_id) == ERROR) return ERROR;
+            if(enemy_set_location(enemy,space_id) == ERROR) return ERROR;
+
+            //if(game_set_enemy_location(game,space_id) == ERROR) return ERROR;
             
             if(enemy_set_health(enemy,health) == ERROR) return ERROR;
-            
+            if(game_set_enemy(game, enemy) == ERROR) return ERROR; 
             }
         }
     fclose(file);
     return OK;
     
+}
+
+STATUS game_load_links(Game *game, char *filename)
+{
+  int i;
+  FILE *file = NULL;
+  char line[WORD_SIZE] = "";
+  char name[WORD_SIZE] = "";
+  char desc[WORD_SIZE] = "";
+  char *toks = NULL;
+  Id id = NO_ID, origin = NO_ID, destination = NO_ID;
+  Space *space = NULL;
+  STATUS status = OK;
+  DIRECTION direction;                  
+  BOOL status_link;   
+  Link *link;  
+//#l:31|Entrada|11|121|1|0|
+  if (!filename)
+  {
+    return ERROR;
+  }
+
+  file = fopen(filename, "r");
+  if (file == NULL)
+  {
+    return ERROR;
+  }
+
+  while (fgets(line, WORD_SIZE, file))
+  {
+    if (strncmp("#l:", line, 3) == 0)
+    {
+      toks = strtok(line + 3, "|");
+      id = atol(toks);
+
+      toks = strtok(NULL, "|");
+      strcpy(name, toks);
+
+      toks = strtok(NULL, "|");
+      origin = atol(toks);
+
+      toks = strtok(NULL, "|");
+      destination = atol(toks);
+
+      toks = strtok(NULL, "|");
+      direction = atol(toks);
+
+      toks = strtok(NULL, "|");
+      status_link = atol(toks);
+
+
+#ifdef DEBUG
+      printf("Leido: %ld|%s|%ld|%ld|%d|%d\n", id, name, origin, destination, direction,status_link  );
+#endif
+      link = link_create(id);
+      if (link != NULL)
+      {
+        link_set_name(link, name);
+        //game_add_space(game, space);
+        link_set_origin(link, origin);
+        link_set_destination(link, destination);
+        link_set_direction(link, direction);
+        link_set_status(link, status_link);
+      }
+    }
+  }
+
+  if (ferror(file))
+  {
+    status = ERROR;
+  }
+
+  fclose(file);
+
+  return status;
 }

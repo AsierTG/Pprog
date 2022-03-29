@@ -49,4 +49,14 @@ STATUS game_reader_load_player(Game *game, char *filename);
  */
 STATUS game_reader_load_enemy(Game *game, char *filename);
 
+/**
+ * @brief Lee el fichero o ficheros para crear el link
+ * @author ALejandro Coloma 
+ * 
+ * @param game puntero a la estructura Game
+ * @param filename puntero con el nombre del fichero
+ * @return OK, si todo ha ido bien o ERROR si hay algún error.
+ */
+STATUS game_load_links(Game *game, char *filename);
+
 #endif

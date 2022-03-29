@@ -53,7 +53,7 @@ enemy.o: enemy.c enemy.h set.h
 	$(CC) $(ARGU) enemy.c
 
 clean:
-	rm -f hormiguero
+	rm -f *.o hormiguero enemy_test space_test
 
 clear:
 	rm -f *.o
